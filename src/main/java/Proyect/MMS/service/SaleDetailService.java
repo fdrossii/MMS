@@ -1,13 +1,19 @@
 package Proyect.MMS.service;
 
-import Proyect.MMS.DTO.ProductDTO;
+import Proyect.MMS.exception.DeleteSaleDetException;
+import Proyect.MMS.exception.SaleDetListException;
+import Proyect.MMS.exception.SaleDetailException;
+import Proyect.MMS.model.Product;
 import Proyect.MMS.model.SaleDetail;
 import Proyect.MMS.repository.SaleDetailRepository;
+import Proyect.MMS.utils.ErrorResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -17,50 +23,68 @@ public class SaleDetailService {
     @Autowired
     ProductService productService;
 
-    public void createSaleDetail(SaleDetail saleDetail){
-        saleDetailRepository.save(saleDetail);
-    }
-
-    public SaleDetail findSaleDetailById (Long id){
-        Optional<SaleDetail> optSaleDetail = saleDetailRepository.findById(id);
-        if (optSaleDetail.isPresent()){
-            return optSaleDetail.get();
-        }else{
-            return null;
+    public void createSaleDetail(SaleDetail saleDetail) throws ErrorResponse {
+        try{
+            saleDetailRepository.save(saleDetail);
+        }catch (Exception e){
+            throw new ErrorResponse(HttpStatus.CONFLICT.value(),e.getMessage(), LocalDate.now());
         }
     }
 
-    public SaleDetail addProductToList(Long saleDetId, Long prodId){
-       ProductDTO product = productService.findProdDto(prodId);
-       Optional <SaleDetail> optSaleDetail = saleDetailRepository.findById(saleDetId);
-       if(product == null || optSaleDetail.isEmpty()){
-           return null;
+    public SaleDetail findById (Long id){
+        if (id == null){
+            throw new IllegalArgumentException("El valor de id es incorrecto");
+        }else{
+            Optional<SaleDetail> optionalSaleDetail = saleDetailRepository.findById(id);
+            if (optionalSaleDetail.isEmpty()){
+                throw new SaleDetailException("Sale Detail does not exist");
+            }else{
+                return optionalSaleDetail.get();
+            }
+        }
+    }
+
+    public List<SaleDetail> findAllSaleDet(){
+        List<SaleDetail> saleDetailList = saleDetailRepository.findAll();
+        if (saleDetailList.isEmpty()){
+            throw new SaleDetListException("Sales details not found");
+        }else{
+            return saleDetailList;
+        }
+    }
+
+    public void addProductToList(Long saleDetId, Long prodId){
+       if(saleDetId == null || prodId == null){
+           throw new IllegalArgumentException("Valor de id incorrecto");
        }else{
-           optSaleDetail.get().getProductList().add(product);
-           return saleDetailRepository.save(optSaleDetail.get());
+           Product product = productService.findProductById(prodId);
+           Optional <SaleDetail> optionalSaleDetail = saleDetailRepository.findById(saleDetId);
+           if(optionalSaleDetail.isEmpty()){
+               throw new NoSuchElementException("Sale detail not exist");
+           }else{
+               optionalSaleDetail.get().getProductList().add(product);
+               saleDetailRepository.save(optionalSaleDetail.get());
+           }
        }
     }
 
-    public HttpStatus deleteSailDetailById (Long id){
-        if (!saleDetailRepository.existsById(id)){
-            return HttpStatus.NOT_FOUND;
+    public void deleteSailDetailById (Long id){
+        if(id == null){
+            throw new IllegalArgumentException("Valor de id incorrecto");
         }else{
-            saleDetailRepository.deleteById(id);
-            return HttpStatus.ACCEPTED;
+            if (!saleDetailRepository.existsById(id)){
+                throw new DeleteSaleDetException("Sale detail does not exist");
+            }else{
+                saleDetailRepository.deleteById(id);
+            }
         }
     }
 
     public SaleDetail updateSaleDetail (SaleDetail saleDetail){
         if (saleDetail.getId()==null){
-            return null;
+            throw new NoSuchElementException("Sale detail does not exist");
         }else {
             return saleDetailRepository.save(saleDetail);
         }
     }
-
-    public List<SaleDetail> findAllSaleDet (){
-        return saleDetailRepository.findAll();
-    }
-
-
 }

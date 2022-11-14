@@ -1,6 +1,6 @@
 package Proyect.MMS.model;
 
-import Proyect.MMS.DTO.ProductDTO;
+
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ public class SaleDetail {
     @Column(name ="product_list")
     @OneToMany(targetEntity = Product.class)
     @JoinColumn(name = "saleDetail_id")
-    private List<ProductDTO> productList = new ArrayList<>();
+    private List<Product> productList = new ArrayList<>();
 
     @Column(name = "total",  scale = 2)
     private Double total;
@@ -37,6 +37,10 @@ public class SaleDetail {
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id){
+        this.id = id;
     }
 
     public Sale getSale() {
@@ -55,11 +59,11 @@ public class SaleDetail {
         this.total = total;
     }
 
-    public List<ProductDTO> getProductList() {
+    public List<Product> getProductList() {
         return productList;
     }
 
-    public void setProductList(List<ProductDTO> productList) {
+    public void setProductList(List<Product> productList) {
         this.productList = productList;
     }
 
