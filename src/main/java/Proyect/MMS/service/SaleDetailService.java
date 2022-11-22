@@ -33,7 +33,7 @@ public class SaleDetailService {
 
     public SaleDetail findById (Long id){
         if (id == null){
-            throw new IllegalArgumentException("El valor de id es incorrecto");
+            throw new IllegalArgumentException("Wrong id format");
         }else{
             Optional<SaleDetail> optionalSaleDetail = saleDetailRepository.findById(id);
             if (optionalSaleDetail.isEmpty()){
@@ -55,7 +55,7 @@ public class SaleDetailService {
 
     public void addProductToList(Long saleDetId, Long prodId){
        if(saleDetId == null || prodId == null){
-           throw new IllegalArgumentException("Valor de id incorrecto");
+           throw new IllegalArgumentException("Wrong if format");
        }else{
            Product product = productService.findProductById(prodId);
            Optional <SaleDetail> optionalSaleDetail = saleDetailRepository.findById(saleDetId);
@@ -70,7 +70,7 @@ public class SaleDetailService {
 
     public void deleteSailDetailById (Long id){
         if(id == null){
-            throw new IllegalArgumentException("Valor de id incorrecto");
+            throw new IllegalArgumentException("Wrong id format");
         }else{
             if (!saleDetailRepository.existsById(id)){
                 throw new DeleteSaleDetException("Sale detail does not exist");

@@ -35,11 +35,11 @@ public class ProductService {
 
     public Product findProductById(Long id) {
         if(id == null){
-            throw new IllegalArgumentException("El valor de id es incorrecto");
+            throw new IllegalArgumentException("Wrong id format");
         }else{
             Optional <Product> optionalProduct = productRepository.findById(id);
             if(optionalProduct.isEmpty()){
-                throw new ProductNotExistException("El producto no existe");
+                throw new ProductNotExistException("Product does not exist");
             }else{
                 return optionalProduct.get();
             }
@@ -50,7 +50,7 @@ public class ProductService {
     {
         List<Product> productList = productRepository.findAll();
         if(productList.isEmpty()){
-            throw new ProductListNotExistException("La lista se encuentra vacía");
+            throw new ProductListNotExistException("List is empty");
         }else{
             return productList;
         }
@@ -58,7 +58,7 @@ public class ProductService {
 
     public Product updateProduct(Product product){
         if (product.getId() == null){
-            throw new ProductUpdateException("El producto a eliminar no existe");
+            throw new ProductUpdateException("Product does not exist");
         }else{
             return productRepository.save(product);
         }
@@ -66,10 +66,10 @@ public class ProductService {
 
     public void deleteProduct(Long id){
        if(id == null){
-           throw new IllegalArgumentException("El valor de id es incorrecto");
+           throw new IllegalArgumentException("Wrong id format");
        }else{
            if(!productRepository.existsById(id)){
-               throw new DeleteProductException("El producto a eliminar no existe");
+               throw new DeleteProductException("Product does not exist");
            }
            else{
                productRepository.deleteById(id);
@@ -79,7 +79,7 @@ public class ProductService {
 
     public ProductDTO findProdDTO (Long id){
         if (id == null){
-            throw new IllegalArgumentException("El valor de id es incorrecto");
+            throw new IllegalArgumentException("Wrong id format");
         }else{
             Optional<Product> optionalProduct = productRepository.findById(id);
             if (optionalProduct.isPresent()){
@@ -89,7 +89,7 @@ public class ProductService {
                 productDTO.setPrice(optionalProduct.get().getPrice());
                 return productDTO;
             }else{
-                throw new ProductNotExistException("El producto no existe");
+                throw new ProductNotExistException("Product does not exist");
             }
         }
     }
